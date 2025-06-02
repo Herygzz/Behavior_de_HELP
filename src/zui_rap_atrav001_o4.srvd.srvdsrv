@@ -1,0 +1,12 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_RAP_ATRAV001'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_RAP_ATRAV001'
+  }
+}
+define service ZUI_RAP_ATRAV001_O4
+  provider contracts odata_v4_ui {
+  expose ZC_RAP_ATRAV001;
+}

@@ -1,0 +1,81 @@
+managed implementation in class ZBP_R_RAP_ATRAV001 unique;
+strict ( 2 );
+with draft;
+extensible;
+define behavior for ZR_RAP_ATRAV001 alias ZrRapAtrav001
+persistent table zrap_atrav001
+extensible
+draft table zrap_atrav001_d
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
+authorization master ( global )
+early numbering  // se agrega para generar el número consecutivo manualmente
+
+
+{
+  // se comentariza debido a que se utilizará EARLY NUMBERING
+  //  field ( mandatory : create )
+  //  TravelId;
+
+  // se agrega el campo como READONLY debido a que se utilizará EARLY NUMBERING
+  field ( readonly ) TravelId;
+
+  field ( mandatory ) CustomerId, BeginDate, EndDate;
+
+  field ( readonly )
+  CreatedBy,
+  CreatedAt,
+  LocalLastChangedBy,
+  LocalLastChangedAt,
+  LastChangedAt;
+
+  // se comentariza debido a que se utilizará EARLY NUMBERING
+  //  field ( readonly : update )
+  //  TravelId;
+
+
+  create;
+  update;
+  delete;
+
+  // Define determination setStatusToOpen
+  determination setStatusToOpen on modify { create; }
+
+  validation validateCustomer on save { create; field CustomerID; }
+  validation validateDates on save { create; field BeginDate, EndDate; }
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+
+  //  draft determine action Prepare;
+  draft determine action Prepare
+  {
+    validation validateCustomer;
+    validation validateDates;
+  }
+
+  mapping for zrap_atrav001 corresponding extensible
+    {
+      TravelId           = travel_id;
+      AgencyId           = agency_id;
+      CustomerId         = customer_id;
+      BeginDate          = begin_date;
+      EndDate            = end_date;
+      BookingFee         = booking_fee;
+      TotalPrice         = total_price;
+      CurrencyCode       = currency_code;
+      Description        = description;
+      OverallStatus      = overall_status;
+      Attachment         = attachment;
+      MimeType           = mime_type;
+      FileName           = file_name;
+      CreatedBy          = created_by;
+      CreatedAt          = created_at;
+      LocalLastChangedBy = local_last_changed_by;
+      LocalLastChangedAt = local_last_changed_at;
+      LastChangedAt      = last_changed_at;
+    }
+
+}
