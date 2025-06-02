@@ -44,6 +44,13 @@ early numbering  // se agrega para generar el número consecutivo manualmente
   validation validateCustomer on save { create; field CustomerID; }
   validation validateDates on save { create; field BeginDate, EndDate; }
 
+  // $self specifies that the type of the result parameter is the same type as the entity
+  // for which the action or function is defined
+  // las acciones se definen en este nivel y se exponen en la Behavior Def. de la Projection
+  // agregar la anotación para hahcer visible la Action mediante metadata extensions
+  // en este ejemplo será para el campo   OverallStatus;
+  action deductDiscount result [1] $self;
+
   draft action Activate optimized;
   draft action Discard;
   draft action Edit;

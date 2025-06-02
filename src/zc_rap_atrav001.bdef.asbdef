@@ -18,4 +18,7 @@ use etag
   use action Resume;
   use action Prepare;
 
+  // actions must be explicitly exposed on the BO projection layer and called by a consumer
+  use action deductDiscount;
+
 }
