@@ -49,7 +49,11 @@ early numbering  // se agrega para generar el número consecutivo manualmente
   // las acciones se definen en este nivel y se exponen en la Behavior Def. de la Projection
   // agregar la anotación para hahcer visible la Action mediante metadata extensions
   // en este ejemplo será para el campo   OverallStatus;
-  action deductDiscount result [1] $self;
+
+  // action deductDiscount result [1] $self;
+  // Se agrega como parámetro la definición de la Abstrac CDS para el descuento
+  action deductDiscount parameter zdd_abs_discount result [1] $self;
+
 
   draft action Activate optimized;
   draft action Discard;

@@ -255,6 +255,27 @@ CLASS lhc_zr_rap_atrav001 IMPLEMENTATION.
     DATA travels_for_update TYPE TABLE FOR UPDATE zr_rap_atrav001.
     DATA(keys_with_valid_discount) = keys.
 
+* Código agregado para ingresar el descuento mediante Abstract CDS parametr
+*------------------------------------------------------------------------------------------------------->
+    LOOP AT keys_with_valid_discount ASSIGNING FIELD-SYMBOL(<key_with_valid_discount>)
+      WHERE %param-descuento IS INITIAL OR %param-descuento > 100 OR %param-descuento <= 0.
+
+      " report invalid discount value appropriately
+      APPEND VALUE #( %tky                       = <key_with_valid_discount>-%tky ) TO failed-zrrapatrav001.
+
+      APPEND VALUE #( %tky                       = <key_with_valid_discount>-%tky
+                      %msg                       = NEW /dmo/cm_flight_messages(
+                                                        textid = /dmo/cm_flight_messages=>discount_invalid
+                                                        severity = if_abap_behv_message=>severity-error )
+                      %element-TotalPrice        = if_abap_behv=>mk-on
+                      %op-%action-deductDiscount = if_abap_behv=>mk-on
+                    ) TO reported-zrrapatrav001.
+
+      " remove invalid discount value
+      DELETE keys_with_valid_discount.
+    ENDLOOP.
+*------------------------------------------------------------------------------------------------------->
+
     " read relevant travel instance data (only booking fee)
     READ ENTITIES OF zr_rap_atrav001 IN LOCAL MODE
         ENTITY ZrRapAtrav001
@@ -263,7 +284,14 @@ CLASS lhc_zr_rap_atrav001 IMPLEMENTATION.
         RESULT DATA(travels).
 
     LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
-      DATA(reduced_fee) = <travel>-BookingFee * ( 1 - 3 / 10 ) .
+* Código agregado para ingresar el descuento mediante Abstract CDS parametr
+*------------------------------------------------------------------------------------------------------->
+*      DATA(reduced_fee) = <travel>-BookingFee * ( 1 - 3 / 10 ) .
+      DATA percentage TYPE decfloat16.
+      DATA(discount_percent) = keys_with_valid_discount[ KEY draft %tky = <travel>-%tky ]-%param-descuento.
+      percentage =  discount_percent / 100 .
+      DATA(reduced_fee) = <travel>-BookingFee * ( 1 - percentage ) .
+*------------------------------------------------------------------------------------------------------->
 
       APPEND VALUE #( %tky       = <travel>-%tky
                     BookingFee = reduced_fee
