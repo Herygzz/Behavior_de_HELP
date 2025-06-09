@@ -20,5 +20,6 @@ use etag
 
   // actions must be explicitly exposed on the BO projection layer and called by a consumer
   use action deductDiscount;
+  use action copyTravel;
 
 }

@@ -54,6 +54,8 @@ early numbering  // se agrega para generar el número consecutivo manualmente
   // Se agrega como parámetro la definición de la Abstrac CDS para el descuento
   action deductDiscount parameter zdd_abs_discount result [1] $self;
 
+  // Factory Actions
+  factory action copyTravel [1];
 
   draft action Activate optimized;
   draft action Discard;

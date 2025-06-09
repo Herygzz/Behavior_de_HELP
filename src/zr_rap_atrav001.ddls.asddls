@@ -45,9 +45,8 @@ define root view entity ZR_RAP_ATRAV001
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
       local_last_changed_at as LocalLastChangedAt,
       @Semantics.systemDateTime.lastChangedAt: true
-      last_changed_at       as LastChangedAt
-
-  ,
+      last_changed_at       as LastChangedAt,
+      
       //public associations
       _Customer,
       _Agency,

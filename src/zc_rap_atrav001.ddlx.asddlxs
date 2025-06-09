@@ -95,6 +95,17 @@ annotate view ZC_RAP_ATRAV001 with
   TotalPrice;
 
   @UI.identification: [ {
+    position: 75
+  } ]
+  @UI.lineItem: [ {
+    position: 75
+  } ]
+  @UI.selectionField: [ {
+    position: 75
+  } ]
+  TotalTax;
+
+  @UI.identification: [ {
     position: 80
   } ]
   @UI.lineItem: [ {
@@ -107,7 +118,7 @@ annotate view ZC_RAP_ATRAV001 with
 
   @UI: {
   lineItem:       [ { position: 90, importance: #HIGH }
-                  //,{ type: #FOR_ACTION, dataAction: 'copyTravel', label: 'Copy Travel' }
+                  ,{ type: #FOR_ACTION, dataAction: 'copyTravel', label: 'Copy Travel' }
                   //,{ type: #FOR_ACTION, dataAction: 'acceptTravel', label: 'Accept Travel' }
                   //,{ type: #FOR_ACTION, dataAction: 'rejectTravel', label: 'Reject Travel' }
      ],

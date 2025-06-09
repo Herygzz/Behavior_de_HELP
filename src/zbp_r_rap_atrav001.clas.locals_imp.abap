@@ -26,7 +26,10 @@ CLASS lhc_zr_rap_atrav001 DEFINITION INHERITING FROM cl_abap_behavior_handler.
         IMPORTING keys FOR ZrRapAtrav001~validateDates,
 
       deductDiscount FOR MODIFY
-        IMPORTING keys FOR ACTION ZrRapAtrav001~deductDiscount RESULT result.
+        IMPORTING keys FOR ACTION ZrRapAtrav001~deductDiscount RESULT result,
+
+      copyTravel FOR MODIFY
+        IMPORTING keys FOR ACTION ZrRapAtrav001~copyTravel.
 
 ENDCLASS.
 
@@ -314,6 +317,51 @@ CLASS lhc_zr_rap_atrav001 IMPLEMENTATION.
     " set action result
     result = VALUE #( FOR travel IN travels_with_discount ( %tky   = travel-%tky
                                                               %param = travel ) ).
+
+  ENDMETHOD.
+
+  METHOD copyTravel.
+
+    DATA: travels TYPE TABLE FOR CREATE zr_rap_atrav001\\ZrRapAtrav001.
+
+    " remove travel instances with initial %cid (i.e., not set by caller API)
+    READ TABLE keys WITH KEY %cid = '' INTO DATA(key_with_inital_cid).
+    ASSERT key_with_inital_cid IS INITIAL.
+
+    " read the data from the travel instances to be copied
+    READ ENTITIES OF zr_rap_atrav001 IN LOCAL MODE
+       ENTITY ZrRapAtrav001
+       ALL FIELDS WITH CORRESPONDING #( keys )
+    RESULT DATA(travel_read_result)
+    FAILED failed.
+
+    LOOP AT travel_read_result ASSIGNING FIELD-SYMBOL(<travel>).
+      " fill in travel container for creating new travel instance
+      APPEND VALUE #( %cid      = keys[ KEY entity %key = <travel>-%key ]-%cid
+                     %is_draft = keys[ KEY entity %key = <travel>-%key ]-%param-%is_draft
+                     %data     = CORRESPONDING #( <travel> EXCEPT TravelID )
+                  )
+      TO travels ASSIGNING FIELD-SYMBOL(<new_travel>).
+
+      " adjust the copied travel instance data
+      "" BeginDate must be on or after system date
+      <new_travel>-BeginDate     = cl_abap_context_info=>get_system_date( ).
+      "" EndDate must be after BeginDate
+      <new_travel>-EndDate       = cl_abap_context_info=>get_system_date( ) + 30.
+      "" OverallStatus of new instances must be set to open ('O')
+      <new_travel>-OverallStatus = travel_status-open.
+    ENDLOOP.
+
+    " create new BO instance
+    MODIFY ENTITIES OF zr_rap_atrav001 IN LOCAL MODE
+       ENTITY ZrRapAtrav001
+       CREATE FIELDS ( AgencyID CustomerID BeginDate EndDate BookingFee
+                         TotalPrice CurrencyCode OverallStatus Description )
+          WITH travels
+       MAPPED DATA(mapped_create).
+
+    " set the new BO instances
+    mapped-zrrapatrav001 = mapped_create-zrrapatrav001.
 
   ENDMETHOD.
 
